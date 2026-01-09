@@ -1,0 +1,11 @@
+[package]
+name = "adblocker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+jni = "0.21.1"
+once_cell = "1.19.0"
+
+[lib]
+crate-type = ["cdylib"]
