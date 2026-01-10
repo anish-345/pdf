@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_new_tab"
+        android:title="New Tab"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_close_tab"
+        android:title="Close Tab"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_add_bookmark"
+        android:title="Add Bookmark"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_bookmarks"
+        android:title="Bookmarks"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_history"
+        android:title="History"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_downloads"
+        android:title="Downloads"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_incognito"
+        android:title="New Incognito Tab"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_save_password"
+        android:title="Save Password"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_passwords"
+        android:title="Passwords"
+        app:showAsAction="never" />
+</menu>
