@@ -1,7 +1,5 @@
 package com.example.superfastbrowser
 
-import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -38,15 +36,15 @@ class PasswordsActivity : AppCompatActivity() {
             val decryptedPassword = EncryptionHelper.decrypt(password.passwordEncrypted, password.iv)
 
             AlertDialog.Builder(this)
-                .setTitle("Password")
-                .setMessage("Username: ${password.username}\nPassword: $decryptedPassword")
-                .setPositiveButton("Copy") { _, _ ->
+                .setTitle(getString(R.string.password))
+                .setMessage("${getString(R.string.username)}: ${password.username}\n${getString(R.string.password)}: $decryptedPassword")
+                .setPositiveButton(getString(R.string.copy)) { _, _ ->
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("password", decryptedPassword)
                     clipboard.setPrimaryClip(clip)
-                    Toast.makeText(this, "Password copied to clipboard", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.password_copied_to_clipboard), Toast.LENGTH_SHORT).show()
                 }
-                .setNegativeButton("Close", null)
+                .setNegativeButton(getString(R.string.close), null)
                 .show()
         }
     }
