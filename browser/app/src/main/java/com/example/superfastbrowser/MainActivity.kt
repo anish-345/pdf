@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         pagerAdapter.addFragment(BrowserFragment())
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = "Tab ${position + 1}"
+            tab.text = getString(R.string.tab_text, position + 1)
         }.attach()
     }
 
@@ -97,9 +97,9 @@ class MainActivity : AppCompatActivity() {
                     val passwordEditText = dialogView.findViewById<EditText>(R.id.password)
 
                     AlertDialog.Builder(this)
-                        .setTitle("Save Password")
+                        .setTitle(getString(R.string.save_password))
                         .setView(dialogView)
-                        .setPositiveButton("Save") { _, _ ->
+                        .setPositiveButton(getString(R.string.save)) { _, _ ->
                             val username = usernameEditText.text.toString()
                             val password = passwordEditText.text.toString()
                             if (username.isNotEmpty() && password.isNotEmpty()) {
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                                 browserDao.addPassword(url, username, password)
                             }
                         }
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(getString(R.string.cancel), null)
                         .show()
                 }
                 true

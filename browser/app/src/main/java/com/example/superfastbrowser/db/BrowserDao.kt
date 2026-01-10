@@ -156,4 +156,36 @@ class BrowserDao(context: Context) {
         cursor.close()
         return passwords
     }
+
+    fun addVideoSubtitle(videoDownloadId: Long, subtitleDownloadId: Long) {
+        val db = dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put(VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_VIDEO_DOWNLOAD_ID, videoDownloadId)
+            put(VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_SUBTITLE_DOWNLOAD_ID, subtitleDownloadId)
+        }
+        db.insert(VideoSubtitleContract.VideoSubtitleEntry.TABLE_NAME, null, values)
+    }
+
+    fun getSubtitleDownloadId(videoDownloadId: Long): Long? {
+        val db = dbHelper.readableDatabase
+        val selection = "${VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_VIDEO_DOWNLOAD_ID} = ?"
+        val selectionArgs = arrayOf(videoDownloadId.toString())
+        val cursor = db.query(
+            VideoSubtitleContract.VideoSubtitleEntry.TABLE_NAME,
+            arrayOf(VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_SUBTITLE_DOWNLOAD_ID),
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+        var subtitleDownloadId: Long? = null
+        with(cursor) {
+            if (moveToFirst()) {
+                subtitleDownloadId = getLong(getColumnIndexOrThrow(VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_SUBTITLE_DOWNLOAD_ID))
+            }
+        }
+        cursor.close()
+        return subtitleDownloadId
+    }
 }
