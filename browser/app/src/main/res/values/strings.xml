@@ -22,4 +22,11 @@
     <string name="settings">Settings</string>
     <string name="passwords">Passwords</string>
     <string name="playback_speed">Playback Speed</string>
+    <string name="google">Google</string>
+    <string name="duckduckgo">DuckDuckGo</string>
+    <string name="bing">Bing</string>
+    <string name="copy">Copy</string>
+    <string name="password_copied_to_clipboard">Password copied to clipboard</string>
+    <string name="close">Close</string>
+    <string name="enter_url">Enter URL</string>
 </resources>

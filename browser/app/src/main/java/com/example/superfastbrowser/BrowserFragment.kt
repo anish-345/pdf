@@ -12,13 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.webkit.*
-import android.widget.Button
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.example.superfastbrowser.db.BrowserDao
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 
 class BrowserFragment : Fragment() {
 
@@ -37,6 +36,7 @@ class BrowserFragment : Fragment() {
     private lateinit var webView: WebView
     private lateinit var urlBar: EditText
     private lateinit var fullscreenContainer: FrameLayout
+    private lateinit var searchEngineIcon: ImageView
     private var customView: View? = null
     private var customViewCallback: WebChromeClient.CustomViewCallback? = null
 
@@ -54,6 +54,11 @@ class BrowserFragment : Fragment() {
         webView = view.findViewById(R.id.webview)
         urlBar = view.findViewById(R.id.url_bar)
         fullscreenContainer = view.findViewById(R.id.fullscreen_container)
+        searchEngineIcon = view.findViewById(R.id.search_engine_icon)
+        val adView = view.findViewById<AdView>(R.id.ad_view)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
 
         webView.settings.javaScriptEnabled = true
         if (isIncognito) {
@@ -184,6 +189,7 @@ class BrowserFragment : Fragment() {
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val searchEngine = sharedPreferences.getString("search_engine", "google")
+        updateSearchEngineIcon(searchEngine)
         val searchUrl = when (searchEngine) {
             "duckduckgo" -> "https://duckduckgo.com"
             "bing" -> "https://www.bing.com"
@@ -198,7 +204,8 @@ class BrowserFragment : Fragment() {
                     if (url.contains(".") && !url.contains(" ")) {
                         webView.loadUrl(url)
                     } else {
-                        val searchUrl = when (searchEngine) {
+                        val currentSearchEngine = sharedPreferences.getString("search_engine", "google")
+                        val searchUrl = when (currentSearchEngine) {
                             "duckduckgo" -> "https://duckduckgo.com/?q=$url"
                             "bing" -> "https://www.bing.com/search?q=$url"
                             else -> "https://www.google.com/search?q=$url"
@@ -211,7 +218,33 @@ class BrowserFragment : Fragment() {
                 false
             }
         }
+
+        searchEngineIcon.setOnClickListener {
+            val popup = PopupMenu(requireContext(), it)
+            popup.menuInflater.inflate(R.menu.search_engines, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                val newSearchEngine = when (item.itemId) {
+                    R.id.search_engine_duckduckgo -> "duckduckgo"
+                    R.id.search_engine_bing -> "bing"
+                    else -> "google"
+                }
+                sharedPreferences.edit().putString("search_engine", newSearchEngine).apply()
+                updateSearchEngineIcon(newSearchEngine)
+                true
+            }
+            popup.show()
+        }
+
         return view
+    }
+
+    private fun updateSearchEngineIcon(searchEngine: String?) {
+        val iconRes = when (searchEngine) {
+            "duckduckgo" -> R.drawable.ic_duckduckgo
+            "bing" -> R.drawable.ic_bing
+            else -> R.drawable.ic_google
+        }
+        searchEngineIcon.setImageResource(iconRes)
     }
 
     fun onBackPressed(): Boolean {
