@@ -10,6 +10,7 @@ object AdBlocker {
 
     external fun isBlocked(domain: String): Boolean
     external fun loadBlocklist(blocklist: String)
+    external fun sanitizeUrl(url: String): String
 
     fun loadBlocklistFromAssets(context: Context) {
         try {
