@@ -121,9 +121,22 @@ class BrowserFragment : Fragment() {
                 view: WebView?,
                 request: WebResourceRequest?
             ): WebResourceResponse? {
-                val url = request?.url
-                if (url != null) {
-                    val domain = url.host
+                val originalUrl = request?.url?.toString()
+                if (originalUrl != null) {
+                    // First, sanitize the URL to remove trackers
+                    val sanitizedUrl = AdBlocker.sanitizeUrl(originalUrl)
+                    if (sanitizedUrl != originalUrl) {
+                        // If trackers were removed, load the clean URL
+                        view?.post {
+                            view.loadUrl(sanitizedUrl)
+                            Toast.makeText(requireContext(), "Trackers removed from URL", Toast.LENGTH_SHORT).show()
+                        }
+                        // Block the original request
+                        return WebResourceResponse("text/plain", "UTF-8", null)
+                    }
+
+                    // If no trackers were removed, proceed with ad-blocking
+                    val domain = Uri.parse(originalUrl).host
                     if (domain != null && AdBlocker.isBlocked(domain)) {
                         return WebResourceResponse("text/plain", "UTF-8", null)
                     }
