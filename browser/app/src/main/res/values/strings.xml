@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Super Fast Browser</string>
+    <string name="downloaded_videos">Downloaded Videos</string>
+    <string name="playback_speed_1x">1x</string>
+    <string name="download_video">Download</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="save_password">Save Password</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="trackers_removed_from_url">Trackers removed from URL</string>
+    <string name="downloading_file">Downloading file…</string>
+    <string name="downloading_video">Downloading video…</string>
+    <string name="tab_text">Tab %1$d</string>
+    <string name="new_tab">New Tab</string>
+    <string name="close_tab">Close Tab</string>
+    <string name="add_bookmark">Add Bookmark</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="history">History</string>
+    <string name="downloads">Downloads</string>
+    <string name="new_incognito_tab">New Incognito Tab</string>
+    <string name="settings">Settings</string>
+    <string name="passwords">Passwords</string>
+    <string name="playback_speed">Playback Speed</string>
 </resources>

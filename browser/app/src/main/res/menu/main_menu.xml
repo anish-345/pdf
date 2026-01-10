@@ -3,42 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_new_tab"
-        android:title="New Tab"
+        android:title="@string/new_tab"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_close_tab"
-        android:title="Close Tab"
+        android:title="@string/close_tab"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_add_bookmark"
-        android:title="Add Bookmark"
+        android:title="@string/add_bookmark"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_bookmarks"
-        android:title="Bookmarks"
+        android:title="@string/bookmarks"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_history"
-        android:title="History"
+        android:title="@string/history"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_downloads"
-        android:title="Downloads"
+        android:title="@string/downloads"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_incognito"
-        android:title="New Incognito Tab"
+        android:title="@string/new_incognito_tab"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_settings"
-        android:title="Settings"
+        android:title="@string/settings"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_save_password"
-        android:title="Save Password"
+        android:title="@string/save_password"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_passwords"
-        android:title="Passwords"
+        android:title="@string/passwords"
         app:showAsAction="never" />
 </menu>

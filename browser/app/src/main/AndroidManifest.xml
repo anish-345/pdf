@@ -26,6 +26,8 @@
             android:parentActivityName=".MainActivity"
             android:exported="false" />
         <activity android:name=".PasswordsActivity" android:exported="false" />
+        <activity android:name=".VideoPlayerActivity" android:exported="false" />
+        <activity android:name=".DownloadedVideosActivity" android:exported="false" />
     </application>
 
 </manifest>

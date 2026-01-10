@@ -10,12 +10,12 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.example.superfastbrowser.db.BrowserDao
@@ -40,7 +40,7 @@ class BrowserFragment : Fragment() {
     private var customView: View? = null
     private var customViewCallback: WebChromeClient.CustomViewCallback? = null
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,13 +69,13 @@ class BrowserFragment : Fragment() {
             val cookies = CookieManager.getInstance().getCookie(url)
             request.addRequestHeader("cookie", cookies)
             request.addRequestHeader("User-Agent", userAgent)
-            request.setDescription("Downloading file...")
+            request.setDescription(getString(R.string.downloading_file))
             request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype))
             val downloadManager = requireActivity().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             downloadManager.enqueue(request)
-            Toast.makeText(requireContext(), "Downloading File", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), getString(R.string.downloading_file), Toast.LENGTH_LONG).show()
         }
 
         webView.webChromeClient = object : WebChromeClient() {
@@ -101,6 +101,26 @@ class BrowserFragment : Fragment() {
                     val newSpeed = playbackSpeeds[currentSpeedIndex]
                     webView.evaluateJavascript("document.getElementsByTagName('video')[0].playbackRate = $newSpeed;", null)
                     playbackSpeedButton.text = "${newSpeed}x"
+                }
+
+                val downloadButton = controlsView.findViewById<Button>(R.id.download_video)
+                downloadButton.setOnClickListener {
+                    webView.evaluateJavascript(
+                        """
+                        (function() {
+                            const video = document.querySelector('video');
+                            if (video) {
+                                let subtitleUrl = null;
+                                const track = video.querySelector('track[kind="subtitles"]');
+                                if (track) {
+                                    subtitleUrl = track.src;
+                                }
+                                AndroidVideo.onVideoDataExtracted(video.src, subtitleUrl);
+                            }
+                        })();
+                        """.trimIndent(),
+                        null
+                    )
                 }
 
                 fullscreenContainer.visibility = View.VISIBLE
@@ -129,7 +149,7 @@ class BrowserFragment : Fragment() {
                         // If trackers were removed, load the clean URL
                         view?.post {
                             view.loadUrl(sanitizedUrl)
-                            Toast.makeText(requireContext(), "Trackers removed from URL", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), getString(R.string.trackers_removed_from_url), Toast.LENGTH_SHORT).show()
                         }
                         // Block the original request
                         return WebResourceResponse("text/plain", "UTF-8", null)
@@ -146,6 +166,12 @@ class BrowserFragment : Fragment() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                if (url != null && url.startsWith("https://", true)) {
+                    view?.addJavascriptInterface(VideoJavaScriptInterface(), "AndroidVideo")
+                } else {
+                    view?.removeJavascriptInterface("AndroidVideo")
+                }
+
                 if (!isIncognito) {
                     val title = view?.title
                     if (url != null && title != null) {
@@ -205,5 +231,39 @@ class BrowserFragment : Fragment() {
 
     fun getCurrentTitle(): String? {
         return webView.title
+    }
+
+    inner class VideoJavaScriptInterface {
+        @JavascriptInterface
+        fun onVideoDataExtracted(videoUrl: String, subtitleUrl: String?) {
+            activity?.runOnUiThread {
+                val downloadManager = requireActivity().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+                // Download video
+                val videoMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(videoUrl))
+                val videoRequest = DownloadManager.Request(Uri.parse(videoUrl))
+                videoRequest.setMimeType(videoMimeType)
+                videoRequest.setTitle(URLUtil.guessFileName(videoUrl, null, videoMimeType))
+                videoRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                videoRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(videoUrl, null, videoMimeType))
+                val videoDownloadId = downloadManager.enqueue(videoRequest)
+
+                // Download subtitle
+                if (subtitleUrl != null) {
+                    val subtitleMimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(subtitleUrl))
+                    val subtitleRequest = DownloadManager.Request(Uri.parse(subtitleUrl))
+                    subtitleRequest.setMimeType(subtitleMimeType)
+                    subtitleRequest.setTitle(URLUtil.guessFileName(subtitleUrl, null, subtitleMimeType))
+                    subtitleRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    subtitleRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(subtitleUrl, null, subtitleMimeType))
+                    val subtitleDownloadId = downloadManager.enqueue(subtitleRequest)
+
+                    val browserDao = BrowserDao(requireContext())
+                    browserDao.addVideoSubtitle(videoDownloadId, subtitleDownloadId)
+                }
+
+                Toast.makeText(requireContext(), getString(R.string.downloading_video), Toast.LENGTH_LONG).show()
+            }
+        }
     }
 }

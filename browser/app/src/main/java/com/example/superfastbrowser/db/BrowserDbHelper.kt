@@ -32,6 +32,14 @@ object PasswordContract {
     }
 }
 
+object VideoSubtitleContract {
+    object VideoSubtitleEntry : BaseColumns {
+        const val TABLE_NAME = "video_subtitles"
+        const val COLUMN_NAME_VIDEO_DOWNLOAD_ID = "video_download_id"
+        const val COLUMN_NAME_SUBTITLE_DOWNLOAD_ID = "subtitle_download_id"
+    }
+}
+
 class BrowserDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     override fun onCreate(db: SQLiteDatabase) {
         val SQL_CREATE_BOOKMARKS_TABLE = "CREATE TABLE ${BookmarkContract.BookmarkEntry.TABLE_NAME} (" +
@@ -54,16 +62,29 @@ class BrowserDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                 "${PasswordContract.PasswordEntry.COLUMN_NAME_PASSWORD} BLOB," +
                 "${PasswordContract.PasswordEntry.COLUMN_NAME_IV} BLOB)"
         db.execSQL(SQL_CREATE_PASSWORDS_TABLE)
+
+        val SQL_CREATE_VIDEO_SUBTITLES_TABLE = "CREATE TABLE ${VideoSubtitleContract.VideoSubtitleEntry.TABLE_NAME} (" +
+                "${BaseColumns._ID} INTEGER PRIMARY KEY," +
+                "${VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_VIDEO_DOWNLOAD_ID} INTEGER," +
+                "${VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_SUBTITLE_DOWNLOAD_ID} INTEGER)"
+        db.execSQL(SQL_CREATE_VIDEO_SUBTITLES_TABLE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE ${PasswordContract.PasswordEntry.TABLE_NAME} ADD COLUMN ${PasswordContract.PasswordEntry.COLUMN_NAME_IV} BLOB")
         }
+        if (oldVersion < 4) {
+            val SQL_CREATE_VIDEO_SUBTITLES_TABLE = "CREATE TABLE ${VideoSubtitleContract.VideoSubtitleEntry.TABLE_NAME} (" +
+                    "${BaseColumns._ID} INTEGER PRIMARY KEY," +
+                    "${VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_VIDEO_DOWNLOAD_ID} INTEGER," +
+                    "${VideoSubtitleContract.VideoSubtitleEntry.COLUMN_NAME_SUBTITLE_DOWNLOAD_ID} INTEGER)"
+            db.execSQL(SQL_CREATE_VIDEO_SUBTITLES_TABLE)
+        }
     }
 
     companion object {
-        const val DATABASE_VERSION = 3
+        const val DATABASE_VERSION = 4
         const val DATABASE_NAME = "Browser.db"
     }
 }
