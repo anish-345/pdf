@@ -1,98 +1,130 @@
 package com.example.superfastbrowser
 
-import android.annotation.SuppressLint
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
-import android.widget.FrameLayout
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var webView: WebView
-    private lateinit var urlBar: EditText
-    private lateinit var fullscreenContainer: FrameLayout
-    private var customView: View? = null
-    private var customViewCallback: WebChromeClient.CustomViewCallback? = null
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager2
+    private lateinit var pagerAdapter: BrowserPagerAdapter
 
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AdBlocker.loadBlocklistFromAssets(this)
         setContentView(R.layout.activity_main)
 
-        webView = findViewById(R.id.webview)
-        urlBar = findViewById(R.id.url_bar)
-        fullscreenContainer = findViewById(R.id.fullscreen_container)
+        tabLayout = findViewById(R.id.tabs)
+        viewPager = findViewById(R.id.view_pager)
+        pagerAdapter = BrowserPagerAdapter(this)
 
-        webView.settings.javaScriptEnabled = true
-        webView.webChromeClient = object : WebChromeClient() {
-            override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-                if (customView != null) {
-                    onHideCustomView()
-                    return
-                }
+        viewPager.adapter = pagerAdapter
+        pagerAdapter.addFragment(BrowserFragment())
 
-                customView = view
-                customViewCallback = callback
-                fullscreenContainer.addView(customView)
-                fullscreenContainer.visibility = View.VISIBLE
-                webView.visibility = View.GONE
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = "Tab ${position + 1}"
+        }.attach()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_new_tab -> {
+                pagerAdapter.addFragment(BrowserFragment())
+                viewPager.currentItem = pagerAdapter.itemCount - 1
+                true
             }
-
-            override fun onHideCustomView() {
-                fullscreenContainer.removeView(customView)
-                fullscreenContainer.visibility = View.GONE
-                webView.visibility = View.VISIBLE
-                customView = null
-                customViewCallback?.onCustomViewHidden()
-                customViewCallback = null
-            }
-        }
-        webView.webViewClient = object : WebViewClient() {
-            override fun shouldInterceptRequest(
-                view: WebView?,
-                request: WebResourceRequest?
-            ): WebResourceResponse? {
-                val url = request?.url
-                if (url != null) {
-                    val domain = url.host
-                    if (domain != null && AdBlocker.isBlocked(domain)) {
-                        return WebResourceResponse("text/plain", "UTF-8", null)
-                    }
-                }
-                return super.shouldInterceptRequest(view, request)
-            }
-        }
-
-        webView.loadUrl("https://www.google.com")
-
-        urlBar.setOnEditorActionListener { _, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE || (event?.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                val url = urlBar.text.toString()
-                if (url.isNotEmpty()) {
-                    webView.loadUrl(url)
+            R.id.action_close_tab -> {
+                if (pagerAdapter.itemCount > 1) {
+                    val currentPosition = viewPager.currentItem
+                    pagerAdapter.removeFragment(currentPosition)
                 }
                 true
-            } else {
-                false
             }
+            R.id.action_add_bookmark -> {
+                val currentFragment = pagerAdapter.getFragment(viewPager.currentItem)
+                val url = currentFragment?.getCurrentUrl()
+                val title = currentFragment?.getCurrentTitle()
+                if (url != null && title != null) {
+                    val browserDao = BrowserDao(this)
+                    browserDao.addBookmark(title, url)
+                }
+                true
+            }
+            R.id.action_bookmarks -> {
+                val intent = Intent(this, BookmarksActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_history -> {
+                val intent = Intent(this, HistoryActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_downloads -> {
+                val intent = Intent(this, DownloadsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_incognito -> {
+                val intent = Intent(this, IncognitoActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_save_password -> {
+                val currentFragment = pagerAdapter.getFragment(viewPager.currentItem)
+                val url = currentFragment?.getCurrentUrl()
+                if (url != null) {
+                    val dialogView = layoutInflater.inflate(R.layout.dialog_save_password, null)
+                    val usernameEditText = dialogView.findViewById<EditText>(R.id.username)
+                    val passwordEditText = dialogView.findViewById<EditText>(R.id.password)
+
+                    AlertDialog.Builder(this)
+                        .setTitle("Save Password")
+                        .setView(dialogView)
+                        .setPositiveButton("Save") { _, _ ->
+                            val username = usernameEditText.text.toString()
+                            val password = passwordEditText.text.toString()
+                            if (username.isNotEmpty() && password.isNotEmpty()) {
+                                val browserDao = BrowserDao(this)
+                                browserDao.addPassword(url, username, password)
+                            }
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+                true
+            }
+            R.id.action_passwords -> {
+                val intent = Intent(this, PasswordsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     override fun onBackPressed() {
-        if (customView != null) {
-            webView.webChromeClient.onHideCustomView()
-        } else if (webView.canGoBack()) {
-            webView.goBack()
+        val currentFragment = pagerAdapter.getFragment(viewPager.currentItem)
+        if (currentFragment != null && currentFragment.onBackPressed()) {
+            // The fragment handled the back press
         } else {
             super.onBackPressed()
         }

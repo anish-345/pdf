@@ -1,6 +1,7 @@
 package com.example.superfastbrowser
 
 import android.content.Context
+import android.widget.Toast
 
 object AdBlocker {
     init {
@@ -16,8 +17,7 @@ object AdBlocker {
             val blocklist = inputStream.bufferedReader().use { it.readText() }
             loadBlocklist(blocklist)
         } catch (e: Exception) {
-            // In a real app, you would handle this error more gracefully
-            e.printStackTrace()
+            Toast.makeText(context, "Error loading blocklist", Toast.LENGTH_SHORT).show()
         }
     }
 }

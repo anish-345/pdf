@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+##############################################################################
+##
+##  Gradle start up script for UN*X
+##
+##############################################################################
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS=""
+
+APP_NAME="Gradle"
+APP_BASE_NAME=`basename "$0"`
+
+# Use the maximum available, or set MAX_FD != -1 to use that value.
+MAX_FD="maximum"
+
+warn () {
+    echo "$*"
+}
+
+die () {
+    echo
+    echo "ERROR: $*"
+    echo
+    exit 1
+}
+
+# OS specific support (must be 'true' or 'false').
+cygwin=false
+msys=false
+darwin=false
+nonstop=false
+case "`uname`" in
+  CYGWIN* )
+    cygwin=true
+    ;;
+  Darwin* )
+    darwin=true
+    ;;
+  MINGW* )
+    msys=true
+    ;;
+  NONSTOP* )
+    nonstop=true
+    ;;
+esac
+
+# Attempt to set APP_HOME
+# Resolve links: $0 may be a link
+PRG="$0"
+# Need this for relative symlinks.
+while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+        PRG="$link"
+    else
+        PRG=`dirname "$PRG"`"/$link"
+    fi
+done
+
+SAVED="`pwd`"
+cd "`dirname \"$PRG\"`/" >/dev/null
+APP_HOME="`pwd -P`"
+cd "$SAVED" >/dev/null
+
+# Add probing for GUESS_HOME on Darwin...
+if [ "$darwin" = "true" ]; then
+    if [ -z "$JAVA_HOME" ]; then
+        if [ -x "/usr/libexec/java_home" ]; then
+            JAVA_HOME=`/usr/libexec/java_home`
+        else
+            JAVA_HOME="/Library/Java/Home"
+        fi
+    fi
+fi
+
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+    [ -n "$APP_HOME" ] &&
+        APP_HOME=`cygpath --unix "$APP_HOME"`
+    [ -n "$JAVA_HOME" ] &&
+        JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+    [ -n "$CLASSPATH" ] &&
+        CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+fi
+
+# If a terminal is not attached, default to calling Gradle with --quiet
+if [ ! -t 0 ]; then
+     quieter=-q
+fi
+
+# For MSYS, ensure paths are in proper format
+if $msys ; then
+    [ -n "$APP_HOME" ] &&
+        APP_HOME=`( cd "$APP_HOME" && pwd -W )`
+    [ -n "$JAVA_HOME" ] &&
+        JAVA_HOME=`( cd "$JAVA_HOME" && pwd -W )`
+    [ -n "$CLASSPATH" ] &&
+        CLASSPATH=`( cd "$CLASSPATH" && pwd -W )`
+fi
+
+if [ -z "$APP_BASE_NAME" ] ; then
+  APP_BASE_NAME=gradle
+fi
+
+# Set a temporary classpath to use to invoke Gradle
+#
+# Note we don't need to quote these paths as they have already been converted to the correct OS format
+#
+if [ -n "$CLASSPATH" ] ; then
+    gradle_classpath="$CLASSPATH"
+else
+    gradle_classpath=""
+fi
+
+# Add the gradle launcher jar to the classpath
+#
+if [ -f "$APP_HOME/gradle/wrapper/gradle-launcher.jar" ] ; then
+  gradle_classpath="$gradle_classpath:$APP_HOME/gradle/wrapper/gradle-launcher.jar"
+elif [ -f "$APP_HOME/lib/gradle-launcher.jar" ] ; then
+  gradle_classpath="$gradle_classpath:$APP_HOME/lib/gradle-launcher.jar"
+fi
+
+# Add the groovy-all jar to the classpath
+#
+if [ -f "$APP_HOME/lib/groovy-all.jar" ] ; then
+  gradle_classpath="$gradle_classpath:$APP_HOME/lib/groovy-all.jar"
+fi
+
+# Split up the JVM options string into an array, following the shell quoting and substitution rules
+function splitJvmOpts() {
+    JVM_OPTS=()
+    for o in $@ ; do
+        JVM_OPTS+=("$o")
+    done
+}
+
+# Use the maximum available, or set MAX_FD != -1 to use that value.
+if [ "$darwin" = "true" ]; then
+    ulimit -n `ulimit -H -n`
+fi
+
+# Add the gradle launcher jar to the classpath
+#
+if [ -n "$JAVA_HOME" ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+else
+    JAVACMD=java
+fi
+
+# Stop on error
+set -e
+
+# For Cygwin, switch paths to Windows format before running java
+if $cygwin ; then
+    APP_HOME=`cygpath --path --windows "$APP_HOME"`
+    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+    gradle_classpath=`cygpath --path --windows "$gradle_classpath"`
+fi
+
+# Execute Gradle
+exec "$JAVACMD" \
+  "${JVM_OPTS[@]}" \
+  -classpath "$gradle_classpath" \
+  org.gradle.wrapper.GradleWrapperMain \
+  "$@"
