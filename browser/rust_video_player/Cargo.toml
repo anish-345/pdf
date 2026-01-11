@@ -1,0 +1,11 @@
+[package]
+name = "rust_video_player"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+vlc = "0.1.0"
+jni = "0.21.1"
+
+[lib]
+crate-type = ["cdylib"]
