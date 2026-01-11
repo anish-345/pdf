@@ -16,8 +16,6 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.example.superfastbrowser.db.BrowserDao
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 
 class BrowserFragment : Fragment() {
 
@@ -55,10 +53,6 @@ class BrowserFragment : Fragment() {
         urlBar = view.findViewById(R.id.url_bar)
         fullscreenContainer = view.findViewById(R.id.fullscreen_container)
         searchEngineIcon = view.findViewById(R.id.search_engine_icon)
-        val adView = view.findViewById<AdView>(R.id.ad_view)
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
-
 
         webView.settings.javaScriptEnabled = true
         if (isIncognito) {
@@ -173,8 +167,11 @@ class BrowserFragment : Fragment() {
                 super.onPageFinished(view, url)
                 if (url != null && url.startsWith("https://", true)) {
                     view?.addJavascriptInterface(VideoJavaScriptInterface(), "AndroidVideo")
+                    view?.addJavascriptInterface(HtmlJavaScriptInterface(), "HtmlViewer")
+                    view?.evaluateJavascript("(function() { HtmlViewer.processHTML(document.documentElement.outerHTML); })();", null)
                 } else {
                     view?.removeJavascriptInterface("AndroidVideo")
+                    view?.removeJavascriptInterface("HtmlViewer")
                 }
 
                 if (!isIncognito) {
@@ -296,6 +293,17 @@ class BrowserFragment : Fragment() {
                 }
 
                 Toast.makeText(requireContext(), getString(R.string.downloading_video), Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    inner class HtmlJavaScriptInterface {
+        @JavascriptInterface
+        fun processHTML(html: String) {
+            val score = AdBlocker.analyzePagePrivacy(html)
+            activity?.runOnUiThread {
+                val privacyScoreTextView = view?.findViewById<TextView>(R.id.privacy_score)
+                privacyScoreTextView?.text = score.toString()
             }
         }
     }

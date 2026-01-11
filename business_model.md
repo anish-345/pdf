@@ -11,9 +11,9 @@ We will adopt a freemium model, offering both a free and a premium version of th
 The primary version of the browser will be free to download and use. This version will be supported by in-app advertising, providing the main revenue stream.
 
 *   **Monetization:**
-    *   **In-App Advertising:** We will integrate Google AdMob to display ads within the application.
-    *   **Ad Placement:** Ads will be placed strategically to be non-intrusive and maintain a high-quality user experience. The initial placement will be a single banner ad at the bottom of the main browser screen. This ensures the ad is visible but does not interfere with web content.
-    *   **User Experience:** We are committed to an ad experience that is not disruptive. We will avoid pop-up ads, full-screen interstitial ads during browsing, and other aggressive formats.
+    *   **In-App Advertising:** We will integrate Google AdMob to display native ads within the application. Native ads are designed to blend in seamlessly with the app's content, providing a less intrusive user experience.
+    *   **Ad Placement:** Ads will be placed strategically within the app's list views, such as the history, bookmarks, and downloads screens. This ensures that the ads are visible but do not interfere with the main browsing experience. The ads will be clearly marked as sponsored content.
+    *   **User Experience:** We are committed to an ad experience that is not disruptive. By using native ads, we can maintain the app's look and feel while still generating revenue. We will avoid pop-up ads, full-screen interstitial ads during browsing, and other aggressive formats.
 
 *   **Target Audience:** General users who are looking for a fast, secure browser and are comfortable with a minimal ad experience.
 
@@ -34,7 +34,7 @@ A premium version will be available as a one-time purchase or a subscription. Th
 ## Implementation Strategy
 
 1.  **Phase 1: Launch Ad-Supported Version:**
-    *   Integrate Google AdMob with a banner ad unit.
+    *   Integrate Google AdMob with native ad units.
     *   Launch the free version on the Google Play Store.
     *   Gather user feedback on the ad experience and overall browser performance.
 

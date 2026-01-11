@@ -79,11 +79,14 @@ pub extern "system" fn Java_com_example_superfastbrowser_AdBlocker_sanitizeUrl<'
     _class: JClass<'a>,
     input: JString<'a>,
 ) -> JString<'a> {
-    let url_str: String = env.get_string(&input).unwrap().into();
+    let url_str: String = match env.get_string(&input) {
+        Ok(s) => s.into(),
+        Err(_) => return input,
+    };
 
     let mut url = match Url::parse(&url_str) {
         Ok(u) => u,
-        Err(_) => return env.new_string(url_str).unwrap().into(),
+        Err(_) => return input,
     };
 
     let original_query_pairs: Vec<(String, String)> = url.query_pairs().map(|(k, v)| (k.into_owned(), v.into_owned())).collect();
@@ -104,9 +107,12 @@ pub extern "system" fn Java_com_example_superfastbrowser_AdBlocker_sanitizeUrl<'
             url.query_pairs_mut().append_pair(&key, &value);
         }
         let sanitized_url_str = url.to_string();
-        env.new_string(sanitized_url_str).unwrap().into()
+        match env.new_string(sanitized_url_str) {
+            Ok(s) => s.into(),
+            Err(_) => input,
+        }
     } else {
-        env.new_string(url_str).unwrap().into()
+        input
     }
 }
 
@@ -151,4 +157,49 @@ mod tests {
 
         assert_eq!(url.to_string(), expected_url);
     }
+}
+
+/// Analyzes the HTML content of a page and returns a privacy score.
+pub fn analyze_page_privacy(html_content: &str) -> i32 {
+    let mut score = 100;
+    let lower_content = html_content.to_lowercase();
+
+    // Deduct points for each tracker found in the blocklist.
+    let blocklist = BLOCKLIST.lock().unwrap();
+    for domain in blocklist.iter() {
+        if lower_content.contains(domain) {
+            score -= 5;
+        }
+    }
+
+    // Deduct points for common fingerprinting scripts.
+    if lower_content.contains("canvas.todataurl") {
+        score -= 10;
+    }
+    if lower_content.contains("navigator.webrtc") {
+        score -= 10;
+    }
+
+    // Ensure the score doesn't go below 0.
+    if score < 0 {
+        0
+    } else {
+        score
+    }
+}
+
+/// JNI function to analyze a page's privacy.
+#[unsafe(no_mangle)]
+#[allow(non_snake_case)]
+pub extern "system" fn Java_com_example_superfastbrowser_AdBlocker_analyzePagePrivacy(
+    mut env: JNIEnv,
+    _class: JClass,
+    html_content: JString,
+) -> i32 {
+    let html = match env.get_string(&html_content) {
+        Ok(s) => String::from(s),
+        Err(_) => return -1,
+    };
+
+    analyze_page_privacy(&html)
 }

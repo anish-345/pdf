@@ -65,7 +65,7 @@ class DownloadsActivity : AppCompatActivity() {
                 val subtitleId = browserDao.getSubtitleDownloadId(downloadId)
                 val subtitleUri = subtitleId?.let { downloadManager.getUriForDownloadedFile(it) }
 
-                val intent = Intent(this, VideoPlayerActivity::class.java)
+                val intent = Intent(this, RustVideoPlayerActivity::class.java)
                 intent.putExtra("videoUri", uri)
                 intent.putExtra("subtitleUri", subtitleUri)
                 startActivity(intent)

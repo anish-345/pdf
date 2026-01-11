@@ -40,6 +40,13 @@ cargo {
     profile = "release"
 }
 
+cargo {
+    module = "../rust_video_player"
+    libname = "rust_video_player"
+    targets = ["x86_64", "aarch64", "armv7"]
+    profile = "release"
+}
+
 tasks.whenTaskAdded { task ->
     if ((task.name == 'javaPreCompileDebug' || task.name == 'javaPreCompileRelease')) {
         task.dependsOn 'cargoBuild'
