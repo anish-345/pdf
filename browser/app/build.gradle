@@ -31,6 +31,16 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    packagingOptions {
+        exclude 'lib/arm64-v8a/libvlc.so'
+        exclude 'lib/arm64-v8a/libvlcjni.so'
+        exclude 'lib/armeabi-v7a/libvlc.so'
+        exclude 'lib/armeabi-v7a/libvlcjni.so'
+        exclude 'lib/x86/libvlc.so'
+        exclude 'lib/x86/libvlcjni.so'
+        exclude 'lib/x86_64/libvlc.so'
+        exclude 'lib/x86_64/libvlcjni.so'
+    }
 }
 
 cargo {
@@ -65,4 +75,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'com.google.android.gms:play-services-ads:22.6.0'
+    implementation 'org.videolan.android:libvlc-all:3.5.1'
 }

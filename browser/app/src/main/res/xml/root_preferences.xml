@@ -22,4 +22,18 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="Adblocker">
+
+        <Preference
+            app:key="adblocker_settings"
+            app:title="Adblocker Settings"
+            app:summary="Configure adblocker rules and settings">
+            <intent android:action="android.intent.action.VIEW"
+                android:targetPackage="com.example.superfastbrowser"
+                android:targetClass="com.example.superfastbrowser.AdblockerSettingsActivity" />
+        </Preference>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

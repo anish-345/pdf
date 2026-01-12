@@ -29,4 +29,12 @@
     <string name="password_copied_to_clipboard">Password copied to clipboard</string>
     <string name="close">Close</string>
     <string name="enter_url">Enter URL</string>
+    <string name="adblocker_settings">Adblocker Settings</string>
+    <string name="popular_adblock_lists">Popular Adblock Lists</string>
+    <string name="custom_rules">Custom Rules</string>
+    <string name="enter_one_domain_per_line">Enter one domain per line</string>
+    <string name="easylist">EasyList</string>
+    <string name="easyprivacy">EasyPrivacy</string>
+    <string name="ublock_filters">uBlock Filters</string>
+    <string name="error_loading_blocklist">Error loading blocklist</string>
 </resources>

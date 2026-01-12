@@ -3,6 +3,7 @@
     package="com.example.superfastbrowser">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
@@ -28,6 +29,10 @@
         <activity android:name=".PasswordsActivity" android:exported="false" />
         <activity android:name=".VideoPlayerActivity" android:exported="false" />
         <activity android:name=".DownloadedVideosActivity" android:exported="false" />
+        <activity android:name=".AdblockerSettingsActivity" android:exported="false" />
+        <activity android:name=".RustVideoPlayerActivity" android:exported="false" />
+
+        <service android:name=".PlaybackService" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

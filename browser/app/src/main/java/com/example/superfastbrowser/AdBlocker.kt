@@ -11,6 +11,8 @@ object AdBlocker {
     external fun isBlocked(domain: String): Boolean
     external fun loadBlocklist(blocklist: String)
     external fun sanitizeUrl(url: String): String
+    external fun setWhitelist(whitelist: String)
+    external fun analyzePagePrivacy(html: String): Int
 
     fun loadBlocklistFromAssets(context: Context) {
         try {
@@ -18,7 +20,7 @@ object AdBlocker {
             val blocklist = inputStream.bufferedReader().use { it.readText() }
             loadBlocklist(blocklist)
         } catch (e: Exception) {
-            Toast.makeText(context, "Error loading blocklist", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.error_loading_blocklist, Toast.LENGTH_SHORT).show()
         }
     }
 }

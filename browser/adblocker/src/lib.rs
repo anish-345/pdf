@@ -8,6 +8,7 @@ use url::Url;
 
 // Global, thread-safe blocklist, initialized lazily.
 static BLOCKLIST: Lazy<Mutex<HashSet<String>>> = Lazy::new(|| Mutex::new(HashSet::new()));
+static WHITELIST: Lazy<Mutex<HashSet<String>>> = Lazy::new(|| Mutex::new(HashSet::new()));
 
 // Set of known tracking parameters.
 static TRACKING_PARAMETERS: Lazy<HashSet<&'static str>> = Lazy::new(|| {
@@ -29,10 +30,10 @@ pub extern "system" fn Java_com_example_superfastbrowser_AdBlocker_loadBlocklist
     mut env: JNIEnv,
     _class: JClass,
     blocklist_str: JString,
-) {
+) -> jboolean {
     let blocklist_content = match env.get_string(&blocklist_str) {
         Ok(s) => String::from(s),
-        Err(_) => return,
+        Err(_) => return 0,
     };
 
     let mut blocklist = BLOCKLIST.lock().unwrap();
@@ -43,10 +44,39 @@ pub extern "system" fn Java_com_example_superfastbrowser_AdBlocker_loadBlocklist
             blocklist.insert(domain.to_string());
         }
     }
+    1
+}
+
+/// JNI function to set the whitelist.
+#[unsafe(no_mangle)]
+#[allow(non_snake_case)]
+pub extern "system" fn Java_com_example_superfastbrowser_AdBlocker_setWhitelist(
+    mut env: JNIEnv,
+    _class: JClass,
+    whitelist_str: JString,
+) -> jboolean {
+    let whitelist_content = match env.get_string(&whitelist_str) {
+        Ok(s) => String::from(s),
+        Err(_) => return 0,
+    };
+
+    let mut whitelist = WHITELIST.lock().unwrap();
+    whitelist.clear();
+    for line in whitelist_content.lines() {
+        let domain = line.trim();
+        if !domain.is_empty() {
+            whitelist.insert(domain.to_string());
+        }
+    }
+    1
 }
 
 /// Checks if a given domain is in the global blocklist.
 fn is_blocked(domain: &str) -> bool {
+    let whitelist = WHITELIST.lock().unwrap();
+    if whitelist.contains(domain) {
+        return false;
+    }
     let blocklist = BLOCKLIST.lock().unwrap();
     blocklist.contains(domain)
 }

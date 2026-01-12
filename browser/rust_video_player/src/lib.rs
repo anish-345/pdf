@@ -12,7 +12,7 @@ pub struct RustMediaPlayer {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_init(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_init(
     _env: JNIEnv,
     _class: JClass,
 ) -> jlong {
@@ -33,7 +33,7 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_setSurface(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_setSurface(
     mut env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
@@ -45,11 +45,12 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
     let player = unsafe { &mut *(player_ptr as *mut RustMediaPlayer) };
     let a_native_window = unsafe { ndk_sys::ANativeWindow_fromSurface(env.get_native_interface(), surface.into_inner()) };
     player.media_player.set_android_context(a_native_window as *mut c_void);
+    unsafe { ndk_sys::ANativeWindow_release(a_native_window) };
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_loadMedia(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_loadMedia(
     mut env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
@@ -72,7 +73,7 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_addSubtitle(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_addSubtitle(
     mut env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
@@ -91,7 +92,7 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_getTime(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_getTime(
     _env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
@@ -105,7 +106,7 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_play(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_play(
     _env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
@@ -119,7 +120,7 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_pause(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_pause(
     _env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
@@ -133,7 +134,7 @@ pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_example_superfastbrowser_RustVideoPlayerActivity_release(
+pub extern "system" fn Java_com_example_superfastbrowser_PlaybackService_release(
     _env: JNIEnv,
     _class: JClass,
     player_ptr: jlong,
